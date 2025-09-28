@@ -60,7 +60,7 @@ function demoScope() {
     var functionVar = 'var-function-scoped';
     console.log(outer, inner, blockConst, functionVar);
   }
-  console.log(outer, inner, /* blockConst not here */, functionVar);
+  console.log(outer, inner, functionVar);
 }
 
 demoScope();
@@ -89,7 +89,7 @@ console.log(constX);
 
 console.log(addDecl(2, 3));
 
-unction addDecl(a, b) {
+function addDecl(a, b) {
   return a + b;
 }
 const addExpr = function (a, b) {
@@ -104,7 +104,7 @@ console.log(addArrow(2, 3));
 const apiUrl = 'https://example.com';
 console.log(apiUrl);
 
-use strict';
+'use strict';
 
 // 1) Hoisting expectation
 // console.log(title); // Uncomment to test: TDZ with let
@@ -138,14 +138,6 @@ const person = {
 
 person.greet(); 
 
-const person = {
-  name: 'Jonas',
-  greet: function () {
-    console.log(`Hello, I am ${this.name}`);
-  },
-};
-
-// Method borrowing
 const anotherPerson = { name: 'Sarah' };
 anotherPerson.greet = person.greet;
 anotherPerson.greet(); 
@@ -163,14 +155,16 @@ button.addEventListener('click', () => person.greet());
 // Or bind the method
 button.addEventListener('click', person.greet.bind(person));
 
-onst obj = {
+const obj = {
   name: 'Object',
 
   regularMethod: function () {
     console.log('Regular:', this.name); 
+  },
 
   arrowMethod: () => {
     console.log('Arrow:', this.name); 
+  }
 };
 
 obj.regularMethod(); 
@@ -262,7 +256,6 @@ functionTypes.modernFunction('modern', 'approach');
 const userCard = {
   name: 'Sarah',
 
-
   setupEvents() {
      console.log('Event setup for:', this.name);
   },
@@ -291,3 +284,128 @@ const myTimer = {
 };
 
 myTimer.startCountdown();
+
+// PRIMITIVES IN STACK
+let age = 30;
+let oldAge = age; 
+age = 31;
+
+console.log('age:', age); 
+console.log('oldAge:', oldAge);
+
+// OBJECTS IN HEAP
+const me = { name: 'Jonas', age: 30 };
+const friend = me; 
+friend.age = 27;
+
+console.log('me:', me); 
+console.log('friend:', friend);
+
+function changeAge(person, newAge) {
+  person.age = newAge;
+  return person;
+}
+
+const originalPerson = { name: 'Sarah', age: 25 };
+const updatedPerson = changeAge(originalPerson, 30);
+
+console.log('original:', originalPerson); 
+console.log('updated:', updatedPerson); 
+console.log('same object?:', originalPerson === updatedPerson);
+
+const original = {
+  name: 'Alice',
+  age: 28,
+  hobbies: ['reading', 'coding'],
+};
+
+const shallowCopy = { ...original };
+
+shallowCopy.name = 'Bob';
+console.log('original name:', original.name); 
+console.log('copy name:', shallowCopy.name); 
+
+shallowCopy.hobbies.push('gaming');
+console.log('original hobbies:', original.hobbies); 
+console.log('copy hobbies:', shallowCopy.hobbies); 
+
+const anotherCopy = Object.assign({}, original);
+console.log('Object.assign copy:', anotherCopy);
+
+const deepOriginal = {
+  name: 'Charlie',
+  age: 32,
+  address: { city: 'Paris', country: 'France' },
+  hobbies: ['travel', 'photography'],
+};
+
+const deepCopy = structuredClone(deepOriginal);
+
+deepCopy.address.city = 'London';
+deepCopy.hobbies.push('cooking');
+
+console.log('original address:', deepOriginal.address); 
+console.log('copy address:', deepCopy.address); 
+console.log('copy hobbies:', deepCopy.hobbies); 
+
+const userManager = {
+  users: [],
+
+  addUser: function (userData) {
+  },
+
+  getUsers: function () {
+  },
+};
+
+// Test your implementation
+const originalUser = { name: 'John', preferences: { theme: 'dark' } };
+userManager.addUser(originalUser);
+
+originalUser.name = 'Modified';
+console.log('Original changed:', originalUser);
+console.log('Stored user:', userManager.getUsers()[0]); 
+
+'use strict';
+
+// 1. Hoisting and TDZ (Hour 1)
+// Without strict mode: undeclaredVar = 'This would create a global variable!';
+// With strict mode: throws ReferenceError
+// undeclaredVar = 'This throws an error in strict mode';
+
+// 2. This keyword (Hour 2)
+function demonstrateThis() {
+  console.log('this in strict mode:', this); 
+demonstrateThis();
+
+// 3. Object mutation prevention attempts
+const readOnlyObj = Object.freeze({ name: 'Frozen' });
+
+try {
+  readOnlyObj.name = 'Changed'; 
+  console.log('Mutation succeeded');
+} catch (error) {
+  console.log('Strict mode caught error:', error.message);
+}
+
+const userManager = {
+  users: [],
+
+  addUser: function (userData) {
+    const userCopy = structuredClone(userData);
+    this.users.push(userCopy);
+    return this; 
+  },
+
+  getUsers: function () {
+    return [...this.users];
+  },
+};
+
+// Test the complete system
+const originalUser = { name: 'John', preferences: { theme: 'dark' } };
+userManager.addUser(originalUser);
+
+originalUser.name = 'Modified';
+console.log('Original changed:', originalUser);
+console.log('Stored user:', userManager.getUsers()[0]); 
