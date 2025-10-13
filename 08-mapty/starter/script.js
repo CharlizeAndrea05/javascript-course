@@ -7,27 +7,31 @@ class Workout {
   clicks = 0;
 
   constructor(coords, distance, duration) {
+    // store the coordinates as an array of latitude and longitude
     this.coords = coords;
+    // store distance in kilometers
     this.distance = distance;
+    // store duration in minutes
     this.duration = duration;
   }
 
   _setDescription() {
     const months = [
-            'January',
-            'February',
-            'March', 
-            'April', 
-            'May', 
-            'June', 
-            'July', 
-            'August', 
-            'September', 
-            'October', 
-            'November', 
-            'December'
-        ];
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
 
+    // generate a description using workout type and current date
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
@@ -40,19 +44,17 @@ class Workout {
 
 const testWorkout = new Workout([40.7128, -74.006], 5.2, 24);
 console.log('Test workout:', testWorkout);
-console.log('Workout ID:', testWorkout.id);
-console.log('Workout date:', testWorkout.date);
 
 class Running extends Workout {
   type = 'running';
 
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
+    // store the cadence (steps per minutes)
     this.cadence = cadence;
     this.calcPace();
     this._setDescription();
   }
-
   calcPace() {
     this.pace = this.duration / this.distance;
     return this.pace;
@@ -68,7 +70,6 @@ class Cycling extends Workout {
     this.calcSpeed();
     this._setDescription();
   }
-
   calcSpeed() {
     this.speed = this.distance / (this.duration / 60);
     return this.speed;
@@ -99,122 +100,123 @@ console.log(
   run1 instanceof Workout,
   cycling1 instanceof Workout
 );
- 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      const { latitude } = position.coords;
-      const { longitude } = position.coords;
-      console.log(`User location: ${latitude}, ${longitude}`);
-    },
-    function () {
-      alert('Could not get your position');
-    }
-  );
-}
 
 class App {
-    #map;
-    #mapZoomLevel = 13;
-    #mapEvent;
-    #workouts = [];
+  #map;
+  #mapZoomLevel = 13;
+  #mapEvent;
+  #workouts = [];
 
-    constructor() {
-        console.log('App is starting');
-        this._getPosition();
-}
+  constructor() {
+    console.log('App is starting');
+    this._getPosition();
+  }
 
-_getPosition() {
+  _getPosition() {
     if (navigator.geolocation) {
-    console.log('🔍 Requesting user location...');
-    navigator.geolocation.getCurrentPosition(
-      this._loadMap.bind(this),
-      this._handleLocationError.bind(this),
-      {
-        timeout: 10000,
-        enableHighAccuracy: true,
-        maximumAge: 600000,
-      }
-    );
-  } else {
-    alert('❌ Geolocation is not supported by this browser');
-     this._loadDefaultMap();
+      console.log('🔍 Requesting user location...');
+      navigator.geolocation.getCurrentPosition(
+        this._loadMap.bind(this),
+        this._handleLocationError.bind(this),
+        {
+          timeout: 10000,
+          enableHighAccuracy: true,
+          maximumAge: 600000,
+        }
+      );
+    } else {
+      alert('❌ Geolocation is not supported by this browser');
+      this._loadDefaultMap();
     }
   }
 
-_handleLocationError(error) {
-      console.error('Geolocation error:', error);
+  _handleLocationError(error) {
+    console.error('Geolocation error:', error);
 
-        let message = 'Could not get your position. ';
+    let message = 'Could not get your position. ';
 
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            message +=
-              'Location access was denied. Please enable location services and refresh the page.';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            message += 'Location information is unavailable.';
-            break;
-          case error.TIMEOUT:
-            message += 'Location request timed out.';
-            break;
-          default:
-            message += 'An unknown error occurred.';
-            break;
-        }
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        message +=
+          'Location access was denied. Please enable location services and refresh the page.';
+        break;
+      case error.POSITION_UNAVAILABLE:
+        message += 'Location information is unavailable.';
+        break;
+      case error.TIMEOUT:
+        message += 'Location request timed out.';
+        break;
+      default:
+        message += 'An unknown error occurred.';
+        break;
+    }
 
-        alert(`📍 ${message}`);
-        this._loadDefaultMap();
-}
+    alert(`📍 ${message}`);
+    this._loadDefaultMap();
+  }
 
-_loadDefaultMap() {
+  _loadDefaultMap() {
     console.log('Loading default map location (Manila)');
 
-        const defaultCoords = [14.604287, 120.994483];
-        this.#map = L.map('map').setView(defaultCoords, this.#mapZoomLevel);
+    // put the actual coordinates
+    const defaultCoords = [14.604, 120.994];
 
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution:
+    // from const map
+    // from 13 to this.#mapZoomLevel
+    this.#map = L.map('map').setView(defaultCoords, this.#mapZoomLevel);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
     this.#map.on('click', this._showForm.bind(this));
 
-    console.log('Default.map loaded succesfully');
-}
+    console.log('Default map loaded successfully');
+  }
 
-_loadMap(position) {
-    const {latitude, longitude} = position.coords;
-        console.log(`Loading map at coordinates: ${latitude}, ${longitude}`);
+  _loadMap() {
+    // extract coordinates from the geolocation position
+    const { latitude, longitude } = position.coords;
+    // test loading map
+    console.log(`Loading map at coordinates: ${latitude}, ${longitude}`);
 
-        const coords = [latitude, longitude];
+    // IMPORTANT PART
+    // create coordinatee array for leaflet to understand
+    const coords = [latitude, longitude];
 
-        this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+    // initialize the map centered at user's location with a zoom level 13
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    // add openstreetmap
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://{s}.tile.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    L.marker(coords).addTo(this.#map).bindPopup('Test location!').openPopup();
+    // add a marker blue
+    L.marker(coords).addTo(this.#map).bindPopup('You are here!').openPopup;
 
+    //new the map event listener
     this.#map.on('click', this._showForm.bind(this));
 
-    console.log('Map created successfully!');
-}
+    console.log('Map loaded successfully at user location');
+  }
 
-_showForm(mapE) {
-  this.#mapEvent = mapE;
-        const { lat, lng } = mapE.latlng;
-        console.log(`Map clicked at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+  _showForm(mapE) {
+    this.#mapEvent = mapE;
+    const { lat, lng } = mapE.latlng;
+    console.log(`Map clicked at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
 
-        L.marker([lat, lng])
-            .addTo(this.#map)
-            .bindPopup(
-                `Workout location<br>Lat: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-        .openPopup();
-    }
+    //Create a marker
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(
+        `Workout location<br>Lat: ${lat.toFixed(4)}<br>Lng: ${lng.toFixed(4)}`
+      )
+      .openPopup();
+  }
 }
 
 const app = new App();
- console.log('hour 2 complete');
+console.log('Hour 2 complete!');
